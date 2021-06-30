@@ -18,6 +18,7 @@ const App = () => {
         >
           Learn React
         </a>
+        <h1 className="text-white text-2xl">HI</h1>
       </header>
     </div>
   );
