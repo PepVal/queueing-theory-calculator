@@ -9,7 +9,10 @@ const App = () => {
     <Router>
       <div className="h-screen">
         <Toolbar heightVh={8} />
-        <div style={{ height: '92vh' }}>
+        <div
+          className="overflow-y-scroll"
+          style={{ height: '92vh', maxHeight: '92vh', minHeight: '92vh' }}
+        >
           <MainStack />
         </div>
       </div>
