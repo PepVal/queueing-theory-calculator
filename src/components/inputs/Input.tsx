@@ -7,6 +7,7 @@ export enum InputTypes {
 }
 
 interface InputProps {
+  symbol: string;
   label: string;
   placeholder: string;
   name: string;
@@ -19,33 +20,34 @@ interface InputProps {
 }
 
 const Input = ({
+  symbol,
   label,
   placeholder,
   name,
   type,
   register,
   error,
-  container,
-  required = { required: 'El campo es obligatorio' },
+  container = '',
+  required = { required: false },
   disabled = false,
 }: InputProps) => {
   return (
     <>
-      <div className={container || 'pt-3 px-3 mb-6 md:mb-0'}>
-        <label
-          className="ml-2 block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2"
-          htmlFor={name}
-        >
-          {label}
-          {required ? <span className="text-red-500">{' *'}</span> : null}
+      <div className={container}>
+        <label className="ml-2 flex tracking-wide mb-2" htmlFor={name}>
+          <p className="text-2xl font-bold">{symbol}</p>
+          <p className="ml-2 self-end">{label}</p>
+          {required.required ? (
+            <span className="text-red-500 self-end">{'*'}</span>
+          ) : null}
         </label>
         <input
           className={`text-black appearance-none block w-full ${
             disabled ? 'bg-gray-300' : 'bg-grey-lighter'
-          } text-grey-darker 
+          }
           border border-grey-lighter rounded py-3 px-4`}
           id={name}
-          disabled={disabled || false}
+          disabled={disabled}
           type={type}
           placeholder={placeholder}
           {...register(name, required)}

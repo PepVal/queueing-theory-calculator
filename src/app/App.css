@@ -1,0 +1,13 @@
+.main-container {
+  max-height: 92vh;
+  /* height: 92vh; */
+  /* height: 100%; */
+  min-height: 92vh;
+}
+
+@media (min-width: 1024px) {
+  .main-container {
+    height: 92vh;
+    min-height: 92vh;
+  }
+}

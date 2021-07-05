@@ -1,5 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+
 import Home from '../views/Home';
 import About from '../views/About';
 import NotFoundPage from '../views/_404';
