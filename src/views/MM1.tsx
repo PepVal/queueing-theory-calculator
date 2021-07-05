@@ -9,34 +9,68 @@ import OptionInput, {
   OptionInputTypes,
 } from '../components/inputs/OptionInput';
 import {
+  MM1Model,
   SystemOrQueuing,
   TypeCalculateMM1,
 } from '../library/queueing/MM1.model';
+import { useEffect } from 'react';
 
 type MM1Values = {
   lambda: number;
   miu: number;
   n: number;
-  calculate: string;
-  system: string;
+  calculate: TypeCalculateMM1;
+  system: SystemOrQueuing;
+};
+
+const LabelSystemOrQueuing: any = {
+  system: 'el sistema',
+  queuing: 'la cola',
+};
+
+const LabelTypeCalculate: any = {
+  fixed: 'exactamente',
+  max: 'máximo',
+  least: 'al menos',
 };
 
 const MM1 = () => {
-  const [showResult, setShowResult] = useState(false);
+  const [showResult, setShowResult] = useState({ loading: false, show: false });
+  const [result, setResult] = useState<MM1Model>();
+  const [labelPn, setLabelPn] = useState<string>('');
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<MM1Values>();
 
-  const onSubmit: SubmitHandler<MM1Values> = (data) => {
+  const onSubmit: SubmitHandler<MM1Values> = async (data) => {
     console.log(data);
-    if (data.lambda < data.miu) {
-      setShowResult(true);
+    const model = new MM1Model(data.lambda, data.miu, data.n);
+    if (model.ro < 1) {
+      setShowResult({ loading: true, show: false });
+      await model.calculateAll(data.system, data.calculate);
+      setResult(model);
+      setLabel(data.calculate, data.system);
+      setShowResult({ loading: false, show: true });
     } else {
       alert('no cumple con la condición de estabilidad');
     }
+  };
+
+  useEffect(() => {
+    setValue('calculate', TypeCalculateMM1.Fixed);
+    setValue('system', SystemOrQueuing.System);
+  }, []);
+
+  const setLabel = (calculate: string, operation: string) => {
+    setLabelPn(`Probabilidad de hallar 
+    ${LabelTypeCalculate[calculate] || 'exactamente'} 
+    ${result?.n || 0} clientes en ${
+      LabelSystemOrQueuing[operation] || 'el sistema'
+    }`);
   };
 
   return (
@@ -44,7 +78,11 @@ const MM1 = () => {
       <div className="flex flex-col rounded-xl w-full shadow-md overflow-hidden sm:w-11/12 lg:flex-row lg:w-11/12">
         <div className="bg-white px-6 pt-4 border w-full">
           <div className="relative flex my-3 justify-center items-center">
-            <Link to="/" className="absolute left-0 hover:bg-gray-200 rounded-full p-2" title="back">
+            <Link
+              to="/"
+              className="absolute left-0 hover:bg-gray-200 rounded-full p-2"
+              title="back"
+            >
               <svg className="w-6 h-6" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -93,21 +131,21 @@ const MM1 = () => {
                 <div>
                   <OptionInput
                     label="Fijo"
-                    name="calcule"
+                    name="calculate"
                     option={TypeCalculateMM1.Fixed}
                     register={register}
                     type={OptionInputTypes.Radio}
                   />
                   <OptionInput
                     label="Al menos"
-                    name="calcule"
+                    name="calculate"
                     option={TypeCalculateMM1.AtLeast}
                     register={register}
                     type={OptionInputTypes.Radio}
                   />
                   <OptionInput
                     label="Máximo"
-                    name="calcule"
+                    name="calculate"
                     option={TypeCalculateMM1.Max}
                     register={register}
                     type={OptionInputTypes.Radio}
@@ -138,9 +176,11 @@ const MM1 = () => {
         </div>
         <div
           className={`w-full lg:min-h-full flex justify-center border px-6 pt-4
-        ${!showResult ? 'bg-gray-200' : 'bg-white'}`}
+          ${!showResult.show ? 'bg-gray-200' : 'bg-white'}`}
         >
-          {!showResult ? (
+          {showResult.loading ? (
+            <p className="self-center my-36">Calculando resultados...</p>
+          ) : !showResult.show ? (
             <p className="self-center my-36">
               Presiona Calcular para ver los resultados
             </p>
@@ -149,19 +189,55 @@ const MM1 = () => {
               <div className="relative flex my-3 justify-center items-center">
                 <h2 className="font-bold text-2xl">Resultados</h2>
               </div>
-              <div className="grid grid-cols-2 gap-16 ">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 ">
                 <div>
-                  <ResultItem symbol="ρ" value={123132} />
-                  <ResultItem symbol="P0" value={123132} />
-                  <ResultItem symbol="Pn" value={123132} />
-                  <ResultItem symbol="Lq" value={123132} />
-                  <ResultItem symbol="L" value={123132} />
+                  <ResultItem
+                    symbol="ρ"
+                    label="Utilización del sistema"
+                    value={result?.ro.toFixed(5)}
+                  />
+                  <ResultItem
+                    symbol="P0"
+                    label="Probabilidad de hallar el sistema vacío"
+                    value={result?.p0.toFixed(5)}
+                  />
+                  <ResultItem
+                    symbol="Pn"
+                    label={labelPn}
+                    value={result?.pn.toFixed(5)}
+                  />
+                  <ResultItem
+                    symbol="Lq"
+                    label="El número esperado de clientes en la cola"
+                    value={result?.lq.toFixed(5)}
+                  />
+                  <ResultItem
+                    symbol="L"
+                    label="El número esperado de clientes en el sistema"
+                    value={result?.l.toFixed(5)}
+                  />
                 </div>
                 <div>
-                  <ResultItem symbol="Wq" value={123132} />
-                  <ResultItem symbol="W" value={123132} />
-                  <ResultItem symbol="Ln" value={123132} />
-                  <ResultItem symbol="Wn" value={123132} />
+                  <ResultItem
+                    symbol="Wq"
+                    label="El tiempo esperado en la cola por los clientes"
+                    value={result?.wq.toFixed(5)}
+                  />
+                  <ResultItem
+                    symbol="W"
+                    label="El tiempo promedio esperado en el sistema por los clientes"
+                    value={result?.w.toFixed(5)}
+                  />
+                  <ResultItem
+                    symbol="Ln"
+                    label="El número esperado de clientes en la cola no vacía"
+                    value={result?.ln.toFixed(5)}
+                  />
+                  <ResultItem
+                    symbol="Wn"
+                    label="El tiempo esperado en la cola para colas no vacías por los clientes"
+                    value={result?.wn.toFixed(5)}
+                  />
                 </div>
               </div>
             </div>

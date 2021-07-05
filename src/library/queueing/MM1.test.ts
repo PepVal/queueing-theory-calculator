@@ -1,11 +1,10 @@
 import { MM1Model } from './MM1.model';
 
-const FIXED = 2;
-
 describe('Test model M/M/1', () => {
   let lambda = 1;
   let miu = 3;
   let n = 5;
+  const FIXED = 2;
   // result values
   let ro = 0.3333333333333333;
   let P0 = 0.6666666666666667;
@@ -33,13 +32,14 @@ describe('Test model M/M/1', () => {
   });
 
   describe('Calculate all values', () => {
-    model.calculateAll();
+    beforeAll(async () => {
+      await model.calculateAll();
+    });
 
     if (ro !== 0) {
       test(`ro (ρ) equals to ${ro.toFixed(FIXED)}`, () => {
         let received = model.ro.toFixed(FIXED);
         let expectValue = ro.toFixed(FIXED);
-
         expect(expectValue).toEqual(received);
       });
     }

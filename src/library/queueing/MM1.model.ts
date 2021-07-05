@@ -11,6 +11,22 @@ export enum TypeCalculateMM1 {
   AtLeast = 'least',
 }
 
+export interface MM1Type {
+  lambda: number;
+  miu: number;
+  n: number;
+  // results
+  ro: number;
+  p0: number;
+  pn: number;
+  lq: number;
+  l: number;
+  wq: number;
+  w: number;
+  wn: number;
+  ln: number;
+}
+
 export class MM1Model {
   // basic values
   readonly lambda: number;
@@ -27,17 +43,22 @@ export class MM1Model {
   wn: number = 0;
   ln: number = 0;
 
+  // constructor() {}
+
   constructor(lambda: number, miu: number, n: number = 0) {
     this.lambda = lambda;
     this.miu = miu;
     this.n = n;
   }
 
-  calculateAll(): void {
+  async calculateAll(
+    system: SystemOrQueuing = SystemOrQueuing.System,
+    typeCalculate: TypeCalculateMM1 = TypeCalculateMM1.Fixed,
+  ): Promise<void> {
     // The probability of finding the busy system or system utilization (ρ)
     this.ro = division(this.lambda, this.miu);
     this.p0 = this.getP0();
-    this.pn = this.getPn();
+    this.pn = this.getPn(system, typeCalculate);
     this.lq = this.getLq();
     this.l = this.getL();
     this.w = this.getW();
@@ -53,9 +74,51 @@ export class MM1Model {
   }
 
   // The probability Pn of finding exactly n customers in the system
-  private getPn(): number {
-    let div = Math.pow(this.ro, this.n);
-    return this.getP0() * div;
+  private getPn(
+    system: SystemOrQueuing,
+    typeCalculate: TypeCalculateMM1,
+  ): number {
+    // fixed
+    if (typeCalculate === TypeCalculateMM1.Fixed) {
+      return this.basicPn(this.n);
+    }
+    // max
+    if (typeCalculate === TypeCalculateMM1.Max) {
+      let value = 0;
+      if (system === SystemOrQueuing.System) {
+        for (let i = 0; i <= this.n; i++) {
+          value += this.basicPn(i);
+          // console.log('MAX SYSTEM', value, i);
+        }
+      } else {
+        let end = this.n;
+        end++;
+        for (let i = 0; i <= end; i++) {
+          value += this.basicPn(i);
+          // console.log('MAX QUEUING', value, i);
+        }
+      }
+      return value;
+    }
+    // at least with system or queuing
+    if (system === SystemOrQueuing.System) {
+      let value = 0;
+      for (let i = 0; i < this.n; i++) {
+        value += this.basicPn(i);
+      }
+      return 1 - value;
+    } else {
+      let value = 0;
+      for (let i = 0; i <= this.n; i++) {
+        value += this.basicPn(i);
+      }
+      return 1 - value;
+    }
+  }
+
+  private basicPn(elevate: number): number {
+    let div = Math.pow(this.ro, elevate);
+    return this.p0 * div;
   }
 
   // The expected number Lq of clients in the queue
