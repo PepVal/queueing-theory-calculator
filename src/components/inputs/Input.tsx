@@ -14,6 +14,7 @@ interface InputProps {
   type: InputTypes;
   register: UseFormRegister<any>;
   error: any;
+  step?: string;
   container?: string; // optional
   required?: any; // optional
   disabled?: boolean; // optional
@@ -27,6 +28,7 @@ const Input = ({
   type,
   register,
   error,
+  step = '',
   container = '',
   required = { required: false },
   disabled = false,
@@ -49,6 +51,7 @@ const Input = ({
           id={name}
           disabled={disabled}
           type={type}
+          step={type === InputTypes.Number ? step : ''}
           placeholder={placeholder}
           {...register(name, required)}
         />

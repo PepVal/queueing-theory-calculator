@@ -1,15 +1,5 @@
-import { division } from '../../utils/MathUtils';
-
-export enum SystemOrQueuing {
-  System = 'system',
-  Queuing = 'queuing',
-}
-
-export enum TypeCalculateMM1 {
-  Fixed = 'fixed',
-  Max = 'max',
-  AtLeast = 'least',
-}
+import { TypeCalculate, SystemOrQueuing } from '../Constants';
+import { Division } from '../../../utils/MathUtils';
 
 export interface MM1Type {
   lambda: number;
@@ -51,12 +41,16 @@ export class MM1Model {
     this.n = n;
   }
 
+  isStatable(): boolean {
+    return Division(this.lambda, this.miu) < 1;
+  }
+
   async calculateAll(
     system: SystemOrQueuing = SystemOrQueuing.System,
-    typeCalculate: TypeCalculateMM1 = TypeCalculateMM1.Fixed,
+    typeCalculate: TypeCalculate = TypeCalculate.Fixed,
   ): Promise<void> {
     // The probability of finding the busy system or system utilization (ρ)
-    this.ro = division(this.lambda, this.miu);
+    this.ro = Division(this.lambda, this.miu);
     this.p0 = this.getP0();
     this.pn = this.getPn(system, typeCalculate);
     this.lq = this.getLq();
@@ -74,16 +68,13 @@ export class MM1Model {
   }
 
   // The probability Pn of finding exactly n customers in the system
-  private getPn(
-    system: SystemOrQueuing,
-    typeCalculate: TypeCalculateMM1,
-  ): number {
+  private getPn(system: SystemOrQueuing, typeCalculate: TypeCalculate): number {
     // fixed
-    if (typeCalculate === TypeCalculateMM1.Fixed) {
+    if (typeCalculate === TypeCalculate.Fixed) {
       return this.basicPn(this.n);
     }
     // max
-    if (typeCalculate === TypeCalculateMM1.Max) {
+    if (typeCalculate === TypeCalculate.Max) {
       let value = 0;
       if (system === SystemOrQueuing.System) {
         for (let i = 0; i <= this.n; i++) {
@@ -125,36 +116,36 @@ export class MM1Model {
   private getLq(): number {
     let numerator = Math.pow(this.lambda, 2);
     let denominator = this.miu * (this.miu - this.lambda);
-    return division(numerator, denominator);
+    return Division(numerator, denominator);
   }
 
   // The expected number L of clients in the system
   private getL(): number {
     let denominator = this.miu - this.lambda;
-    return division(this.lambda, denominator);
+    return Division(this.lambda, denominator);
   }
 
   // The expected time Wq in the queue by the clients
   private getWq(): number {
     let denominator = this.miu * (this.miu - this.lambda);
-    return division(this.lambda, denominator);
+    return Division(this.lambda, denominator);
   }
 
   // The expected average time W in the system by the clients
   private getW(): number {
     let denominator = this.miu - this.lambda;
-    return division(1, denominator);
+    return Division(1, denominator);
   }
 
   // The expected number Ln of clients in the non-empty queue
   private getLn(): number {
     let denominator = this.miu - this.lambda;
-    return division(this.lambda, denominator);
+    return Division(this.lambda, denominator);
   }
 
   // The expected time Wn in the queue for queues not empty by clients
   private getWn(): number {
     let denominator = this.miu - this.lambda;
-    return division(1, denominator);
+    return Division(1, denominator);
   }
 }
