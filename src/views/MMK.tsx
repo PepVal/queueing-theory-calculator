@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import ResultItem from '../components/results/ResultItem';
 import Button, { ButtonType } from '../components/buttons/Button';
 import Input, { InputTypes } from '../components/inputs/Input';
 import OptionInput, {
@@ -10,6 +9,7 @@ import OptionInput, {
 } from '../components/inputs/OptionInput';
 import { MMKModel } from '../library/queueing/formulas/MMK.model';
 import { SystemOrQueuing, TypeCalculate } from '../library/queueing/Constants';
+import TabsMMK from '../components/tabs/TabsMMK';
 
 type MMKValues = {
   lambda: number;
@@ -33,7 +33,7 @@ const LabelTypeCalculate: any = {
 
 const MMK = () => {
   const [showResult, setShowResult] = useState({ loading: false, show: false });
-  const [result, setResult] = useState<MMKModel>();
+  const [result, setResult] = useState<MMKModel>(new MMKModel(0,0,0));
   const [labelPn, setLabelPn] = useState<string>('');
 
   const {
@@ -132,7 +132,10 @@ const MMK = () => {
               container="mt-2"
               required={{
                 required: 'El campo es obligatorio',
-                min: { value: 2, message: 'Debe tener mínimo 2 servidores para ser M/M/K' },
+                min: {
+                  value: 2,
+                  message: 'Debe tener mínimo 2 servidores para ser M/M/K',
+                },
               }}
             />
             <div className="mt-2">
@@ -207,65 +210,12 @@ const MMK = () => {
             </p>
           ) : (
             <div>
-              <div className="relative flex my-3 justify-center items-center">
+              <TabsMMK result={result} labelPn={labelPn} />
+
+              {/* <div className="relative flex my-3 justify-center items-center">
                 <h2 className="font-bold text-2xl">Resultados</h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 ">
-                <div>
-                  <ResultItem
-                    symbol="P0"
-                    label="Probabilidad de hallar el sistema vacío"
-                    value={result?.p0.toFixed(5)}
-                  />
-                  <ResultItem
-                    symbol="Pk"
-                    label="La probabilidad de que un usuario que llega tenga que esperar (k o más)"
-                    value={result?.pk.toFixed(5)}
-                  />
-                  <ResultItem
-                    symbol="Pne"
-                    label="Probabilidad de que un usuario que llega no tenga que esperar"
-                    value={result?.pne.toFixed(5)}
-                  />
-                  <ResultItem
-                    symbol="Pn"
-                    label={labelPn}
-                    value={result?.pn.toFixed(5)}
-                  />
-                  <ResultItem
-                    symbol="L"
-                    label="El número esperado de clientes en el sistema"
-                    value={result?.l.toFixed(5)}
-                  />
-                </div>
-                <div>
-                  <ResultItem
-                    symbol="Lq"
-                    label="El número esperado de clientes en la cola"
-                    value={result?.lq.toFixed(5)}
-                  />
-                  <ResultItem
-                    symbol="Ln"
-                    label="El número esperado de clientes en la cola no vacía"
-                    value={result?.ln.toFixed(5)}
-                  />
-                  <ResultItem
-                    symbol="W"
-                    label="El tiempo promedio esperado en el sistema por los clientes"
-                    value={result?.w.toFixed(5)}
-                  />
-                  <ResultItem
-                    symbol="Wq"
-                    label="El tiempo esperado en la cola por los clientes"
-                    value={result?.wq.toFixed(5)}
-                  />
-                  <ResultItem
-                    symbol="Wn"
-                    label="El tiempo esperado en la cola para colas no vacías por los clientes"
-                    value={result?.wn.toFixed(5)}
-                  />
-                </div>
-              </div>
+             */}
             </div>
           )}
         </div>

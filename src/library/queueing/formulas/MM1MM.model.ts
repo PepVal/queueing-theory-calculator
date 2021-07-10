@@ -1,7 +1,7 @@
 import { SystemOrQueuing, TypeCalculate } from '../Constants';
 import { Division, Factorial, Power } from './../../../utils/MathUtils';
 
-export class MMKModel {
+export class MM1MMModel {
   // basic values
   readonly lambda: number;
   readonly miu: number;
