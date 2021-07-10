@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useForm, SubmitHandler } from 'react-hook-form';
 
 import ResultItem from '../components/results/ResultItem';
 import Button, { ButtonType } from '../components/buttons/Button';
@@ -8,18 +8,14 @@ import Input, { InputTypes } from '../components/inputs/Input';
 import OptionInput, {
   OptionInputTypes,
 } from '../components/inputs/OptionInput';
-import {
-  MM1Model,
-  SystemOrQueuing,
-  TypeCalculateMM1,
-} from '../library/queueing/MM1.model';
-import { useEffect } from 'react';
+import { MM1Model } from '../library/queueing/formulas/MM1.model';
+import { SystemOrQueuing, TypeCalculate } from '../library/queueing/Constants';
 
 type MM1Values = {
   lambda: number;
   miu: number;
   n: number;
-  calculate: TypeCalculateMM1;
+  calculate: TypeCalculate;
   system: SystemOrQueuing;
 };
 
@@ -47,13 +43,17 @@ const MM1 = () => {
   } = useForm<MM1Values>();
 
   const onSubmit: SubmitHandler<MM1Values> = async (data) => {
-    console.log(data);
-    const model = new MM1Model(data.lambda, data.miu, data.n);
-    if (model.ro < 1) {
+    // parse data for avoid problems
+    let lambda = parseFloat(data.lambda.toString());
+    let miu = parseFloat(data.miu.toString());
+    let n = parseInt(data.n.toString());
+    const model = new MM1Model(lambda, miu, n);
+
+    if (model.isStatable()) {
       setShowResult({ loading: true, show: false });
       await model.calculateAll(data.system, data.calculate);
       setResult(model);
-      setLabel(data.calculate, data.system);
+      setLabel(n, data.calculate, data.system);
       setShowResult({ loading: false, show: true });
     } else {
       alert('no cumple con la condición de estabilidad');
@@ -61,16 +61,14 @@ const MM1 = () => {
   };
 
   useEffect(() => {
-    setValue('calculate', TypeCalculateMM1.Fixed);
+    setValue('calculate', TypeCalculate.Fixed);
     setValue('system', SystemOrQueuing.System);
-  }, []);
+  }, [setValue]);
 
-  const setLabel = (calculate: string, operation: string) => {
+  const setLabel = (n: number, calculate: string, operation: string) => {
     setLabelPn(`Probabilidad de hallar 
     ${LabelTypeCalculate[calculate] || 'exactamente'} 
-    ${result?.n || 0} clientes en ${
-      LabelSystemOrQueuing[operation] || 'el sistema'
-    }`);
+    ${n} clientes en ${LabelSystemOrQueuing[operation] || 'el sistema'}`);
   };
 
   return (
@@ -92,6 +90,7 @@ const MM1 = () => {
             </Link>
             <h2 className="font-bold text-2xl">M/M/1</h2>
           </div>
+
           <form onSubmit={handleSubmit(onSubmit)}>
             <Input
               symbol="λ"
@@ -101,6 +100,7 @@ const MM1 = () => {
               type={InputTypes.Number}
               register={register}
               error={errors.lambda}
+              step='0.001'
               required={{ required: 'El campo es obligatorio' }}
             />
             <Input
@@ -112,6 +112,7 @@ const MM1 = () => {
               register={register}
               error={errors.miu}
               container="mt-2"
+              step='0.001'
               required={{ required: 'El campo es obligatorio' }}
             />
             <div className="mt-2">
@@ -130,23 +131,23 @@ const MM1 = () => {
               <div className="flex mt-1">
                 <div>
                   <OptionInput
-                    label="Fijo"
+                    label="Exactamente"
                     name="calculate"
-                    option={TypeCalculateMM1.Fixed}
+                    option={TypeCalculate.Fixed}
                     register={register}
                     type={OptionInputTypes.Radio}
                   />
                   <OptionInput
                     label="Al menos"
                     name="calculate"
-                    option={TypeCalculateMM1.AtLeast}
+                    option={TypeCalculate.AtLeast}
                     register={register}
                     type={OptionInputTypes.Radio}
                   />
                   <OptionInput
                     label="Máximo"
                     name="calculate"
-                    option={TypeCalculateMM1.Max}
+                    option={TypeCalculate.Max}
                     register={register}
                     type={OptionInputTypes.Radio}
                   />
