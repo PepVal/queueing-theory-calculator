@@ -43,7 +43,7 @@ const CostTab = ({ mmk }: CostMMKProps) => {
           error={errors.time}
           required={{ required: 'El campo es obligatorio' }}
         />
-        <div className="mt-2 grid grid-cols-2 gap-2">
+        <div className="mt-2 flex flex-col lg:grid lg:grid-cols-2 lg:gap-2">
           <Input
             symbol="Cts"
             label="costo por tiempo en el sistema"
