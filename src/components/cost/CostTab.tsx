@@ -41,6 +41,7 @@ const CostTab = ({ mmk }: CostMMKProps) => {
           type={InputTypes.Number}
           register={register}
           error={errors.time}
+          required={{ required: 'El campo es obligatorio' }}
         />
         <div className="mt-2 grid grid-cols-2 gap-2">
           <Input
@@ -75,7 +76,9 @@ const CostTab = ({ mmk }: CostMMKProps) => {
             value={cost?.ctExercise.toFixed(6)}
           />
         ) : (
-          <div className="flex justify-center items-center">Presiona Calcular Costos para ver los resultados</div>
+          <div className="flex justify-center items-center">
+            Presiona Calcular Costos para ver los resultados
+          </div>
         )}
       </div>
     </div>
