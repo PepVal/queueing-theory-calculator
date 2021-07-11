@@ -21,7 +21,7 @@ const TabsMMK = ({ result, labelPn }: TabsMMKProps) => {
     <>
       <AppBar position="static" elevation={0}>
         <Tabs
-          className="bg-white text-black shadow-sm"
+          className="bg-white text-black shadow"
           indicatorColor="primary"
           variant="fullWidth"
           value={value}
