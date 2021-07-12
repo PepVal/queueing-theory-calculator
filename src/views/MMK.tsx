@@ -75,6 +75,7 @@ const MMK = () => {
     ${LabelTypeCalculate[calculate] || 'exactamente'} 
     ${n} clientes en ${LabelSystemOrQueuing[operation] || 'el sistema'}`);
   };
+  
   return (
     <div className="flex justify-center h-full lg:items-center">
       <div className="flex flex-col rounded-xl w-full shadow-md overflow-hidden sm:w-11/12 lg:flex-row lg:w-11/12">
