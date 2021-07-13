@@ -19,7 +19,7 @@ export class CostMMK {
   }
 
   calculateExercise(cs: number, cts: number) {
-    this.ctExercise = this.mmk.lambda * this.time * cts + this.mmk.lambda * cs;
+    this.ctExercise = this.mmk.lambda * this.time * cts + this.mmk.k * cs;
   }
 
   calculateAll(cte: number, cts: number, ctse: number, cs: number) {

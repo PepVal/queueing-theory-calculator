@@ -12,14 +12,14 @@ const Toolbar = ({ heightVh }: propsToolbar) => {
   return (
     <header
       className="w-full h-14 bg-blue-500 flex items-center lg:justify-center"
-      style={{ height: `${heightVh}vh` }}
+      style={{ height: `${heightVh}vh`, minHeight: 56 }}
     >
       <div className="lg:hidden">
         <Slidebar />
       </div>
       <div className="absolute flex items-center justify-center w-full lg:w-11/12">
         <h1 className="text-xl font-bold text-white lg:text-center lg:whitespace-nowrap">
-          <Link to="/">Queueing Calculator</Link>
+          <Link title="Home" to="/">Queueing Calculator</Link>
         </h1>
         <div className="hidden lg:flex lg:w-full lg:justify-end lg:items-center">
           <NavItem name="Theory" route={Routes.theory} />

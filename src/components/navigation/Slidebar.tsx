@@ -12,15 +12,36 @@ const Slidebar = () => {
         setIsOpen(state.isOpen);
       }}
     >
-      <Link className="hidden lg:block" to="/theory">
+      <Link
+        onClick={() => {
+          setIsOpen(false);
+        }}
+        className="hidden lg:block"
+        to="/theory"
+      >
         Theory
       </Link>
-      <Link className="hidden lg:block" to="/about">
+      <Link
+        onClick={() => {
+          setIsOpen(false);
+        }}
+        className="hidden lg:block"
+        to="/about"
+      >
         About
       </Link>
-      <Link className="hidden lg:block" to="/#">
+      <a
+        onClick={() => {
+          setIsOpen(false);
+        }}
+        title="GitHub repository"
+        className="hidden lg:block"
+        href="https://github.com/PepVal/queueing-theory-calculator"
+        target="_blank"
+        rel="noreferrer"
+      >
         GitHub
-      </Link>
+      </a>
     </Menu>
   );
 };

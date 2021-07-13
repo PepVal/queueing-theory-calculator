@@ -11,6 +11,12 @@ interface CostMMKProps {
   mmk: MMKModel;
 }
 
+type CostMMKValues = {
+  time: number;
+  cts: number;
+  cs: number;
+};
+
 const CostTab = ({ mmk }: CostMMKProps) => {
   const [showResult, setShowResult] = useState(false);
   const [cost, setCost] = useState<CostMMK>();
@@ -19,13 +25,16 @@ const CostTab = ({ mmk }: CostMMKProps) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<any>();
+  } = useForm<CostMMKValues>();
 
-  const onSubmit: SubmitHandler<any> = (data) => {
+  const onSubmit: SubmitHandler<CostMMKValues> = (data) => {
     console.log(data);
     setShowResult(false);
     let time = parseFloat(data.time.toString());
+    let cts = parseFloat(data.cts.toString());
+    let cs = parseFloat(data.cs.toString());
     const cost = new CostMMK(mmk, time);
+    cost.calculateExercise(cs, cts);
     setCost(cost);
     setShowResult(true);
   };
@@ -41,25 +50,30 @@ const CostTab = ({ mmk }: CostMMKProps) => {
           type={InputTypes.Number}
           register={register}
           error={errors.time}
+          required={{ required: 'El campo es obligatorio' }}
         />
-        <div className="mt-2 grid grid-cols-2 gap-2">
+        <div className="mt-2 flex flex-col lg:grid lg:grid-cols-2 lg:gap-2">
           <Input
             symbol="Cts"
-            label="costo por tiempo en el sistema"
+            label="$ por tiempo en el sistema"
             name="cts"
             placeholder="0"
             type={InputTypes.Number}
             register={register}
             error={errors.cts}
+            step="0.001"
+            required={{ required: 'El campo es obligatorio' }}
           />
           <Input
             symbol="Cs"
-            label="costo del servidor"
+            label="$ del servidor"
             name="cs"
             placeholder="0"
             type={InputTypes.Number}
             register={register}
             error={errors.cs}
+            step="0.001"
+            required={{ required: 'El campo es obligatorio' }}
           />
         </div>
 
@@ -72,10 +86,12 @@ const CostTab = ({ mmk }: CostMMKProps) => {
           <ResultItem
             label="Costo total del sistema"
             symbol="CT"
-            value={cost?.ctExercise.toFixed(6)}
+            value={cost?.ctExercise.toFixed(5)}
           />
         ) : (
-          <div className="flex justify-center items-center">Presiona Calcular Costos para ver los resultados</div>
+          <div className="flex justify-center items-center p-12 rounded-sm bg-gray-200">
+            Presiona Calcular Costos para ver los resultados
+          </div>
         )}
       </div>
     </div>
