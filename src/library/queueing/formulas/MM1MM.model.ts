@@ -133,7 +133,9 @@ export class MM1MMModel {
 
     // (lambda/miu)^n
     let item2 = Power(Division(this.lambda, this.miu), n);
-    return item1 * item2;
+
+    // item1 * item2 * P0
+    return item1 * item2 * this.p0;
   }
 
   // The expected number L of clients in the system
