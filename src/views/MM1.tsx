@@ -194,7 +194,7 @@ const MM1 = () => {
                 <div>
                   <ResultItem
                     symbol="ρ"
-                    label="Utilización del sistema"
+                    label="Probabilidad de hallar el sistema ocupado"
                     value={result?.ro.toFixed(5)}
                   />
                   <ResultItem
